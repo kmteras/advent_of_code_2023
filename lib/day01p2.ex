@@ -1,5 +1,4 @@
 defmodule Day01P2 do
-
   def solve(filename) do
     File.read!(filename)
     |> String.trim()
@@ -9,7 +8,10 @@ defmodule Day01P2 do
   end
 
   defp digits(list) do
-    case Regex.scan(~r/(\d|one|two|three|four|five|six|seven|eight|nine).*(\d|one|two|three|four|five|six|seven|eight|nine)/, list) do
+    case Regex.scan(
+           ~r/(\d|one|two|three|four|five|six|seven|eight|nine).*(\d|one|two|three|four|five|six|seven|eight|nine)/,
+           list
+         ) do
       [[_, first, last]] ->
         String.to_integer(to_int(first) <> to_int(last))
 
