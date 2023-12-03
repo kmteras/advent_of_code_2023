@@ -18,84 +18,66 @@ defmodule Day03P1 do
 
   defp map_line(grid) do
     Enum.reduce(grid, {%{}, MapSet.new([])}, fn {{ox, oy}, n}, {acc, checked} ->
+      # Check if number was already used by building something else or current value is symbol
       if MapSet.member?(checked, {ox, oy}) || Integer.parse(n) == :error do
         {acc, checked}
       else
-        right =
-          case Map.get(grid, {ox + 1, oy}) do
-            nil ->
-              {{ox, oy}, n, checked}
+        {{x, y}, n, checked, _} =
+          case look_for_value(grid, checked, n, {ox, oy}, 1) do
+            {{x, y}, n, checked, true} ->
+              look_for_value(grid, checked, n, {ox, oy}, 2)
 
             res ->
-              case Integer.parse(res) do
-                :error ->
-                  {{ox, oy}, n, checked}
-
-                {_, _} ->
-                  n = n <> res
-                  checked = MapSet.put(checked, {ox + 1, oy})
-
-                  case Map.get(grid, {ox + 2, oy}) do
-                    nil ->
-                      {{ox, oy}, n, checked}
-
-                    res ->
-                      case Integer.parse(res) do
-                        :error ->
-                          {{ox, oy}, n, checked}
-
-                        {_, _} ->
-                          {{ox, oy}, n <> res, MapSet.put(checked, {ox + 2, oy})}
-                      end
-                  end
-              end
+              res
           end
 
-        case right do
-          nil ->
-            {acc, checked}
-
-          {{x, y}, n, checked} ->
-            left =
-              case Map.get(grid, {ox - 1, oy}) do
-                nil ->
-                  nil
-
-                res ->
-                  case Integer.parse(res) do
-                    :error ->
-                      {{ox, oy}, n, checked}
-
-                    {_, _} ->
-                      n = res <> n
-                      checked = MapSet.put(checked, {ox - 1, oy})
-
-                      case Map.get(grid, {ox - 2, oy}) do
-                        nil ->
-                          {{ox - 1, oy}, n, checked}
-
-                        res ->
-                          case Integer.parse(res) do
-                            :error ->
-                              {{ox - 1, oy}, n, checked}
-
-                            {_, _} ->
-                              {{ox - 2, oy}, res <> n, MapSet.put(checked, {ox - 2, oy})}
-                          end
-                      end
-                  end
+        {{x, y}, n, checked, _} =
+          case look_for_value(grid, checked, n, {ox, oy}, -1) do
+            {{x, y}, n, checked, true} ->
+              case look_for_value(grid, checked, n, {ox, oy}, -2) do
+                {{x, y}, n, checked, true} = res -> res
+                # Return x and y from previous find
+                res -> {{x, y}, n, checked, false}
               end
 
-            case left do
-              {{x, y}, n, checked} ->
-                {Map.put(acc, {x, y}, n), checked}
+            res ->
+              res
+          end
 
-              nil ->
-                {Map.put(acc, {x, y}, n), checked}
-            end
-        end
+        {Map.put(acc, {x, y}, n), checked}
       end
     end)
+  end
+
+  defp look_for_value(grid, checked, n, {ox, oy}, dx) do
+    case Map.get(grid, {ox + dx, oy}) do
+      nil ->
+        {{ox, oy}, n, checked, false}
+
+      res ->
+        case Integer.parse(res) do
+          :error ->
+            {{ox, oy}, n, checked, false}
+
+          {_, _} ->
+            word =
+              if dx > 0 do
+                n <> res
+              else
+                res <> n
+              end
+
+            # Adjust origin if looking back
+            x =
+              if dx < 0 do
+                ox + dx
+              else
+                ox
+              end
+
+            {{x, oy}, word, MapSet.put(checked, {ox + dx, oy}), true}
+        end
+    end
   end
 
   defp grid_to_map(grid) do
