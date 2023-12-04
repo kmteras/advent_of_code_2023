@@ -22,9 +22,9 @@ defmodule Day03P1 do
       if MapSet.member?(checked, {ox, oy}) || Integer.parse(n) == :error do
         {acc, checked}
       else
-        {{x, y}, n, checked, _} =
+        {_coords, n, checked, _} =
           case look_for_value(grid, checked, n, {ox, oy}, 1) do
-            {{x, y}, n, checked, true} ->
+            {_coords, n, checked, true} ->
               look_for_value(grid, checked, n, {ox, oy}, 2)
 
             res ->
@@ -35,9 +35,9 @@ defmodule Day03P1 do
           case look_for_value(grid, checked, n, {ox, oy}, -1) do
             {{x, y}, n, checked, true} ->
               case look_for_value(grid, checked, n, {ox, oy}, -2) do
-                {{x, y}, n, checked, true} = res -> res
+                {_coords, _n, _checked, true} = res -> res
                 # Return x and y from previous find
-                res -> {{x, y}, n, checked, false}
+                _res -> {{x, y}, n, checked, false}
               end
 
             res ->

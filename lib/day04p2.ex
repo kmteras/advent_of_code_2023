@@ -21,14 +21,14 @@ defmodule Day04P2 do
     common = Enum.count(MapSet.intersection(MapSet.new(winning), MapSet.new(yours)))
 
     if common == 0 do
-      Map.merge(acc, Map.new([{n, 1}]), fn k, a, b -> a + b end)
+      Map.merge(acc, Map.new([{n, 1}]), fn _k, a, b -> a + b end)
     else
       range = Enum.to_list(Range.new(n + 1, n + common))
 
       new_count = Map.new(range, fn nv -> {nv, Map.get(acc, n, 0) + 1} end)
       new_count = Map.put(new_count, n, 1)
 
-      Map.merge(acc, new_count, fn k, a, b -> a + b end)
+      Map.merge(acc, new_count, fn _k, a, b -> a + b end)
     end
   end
 end

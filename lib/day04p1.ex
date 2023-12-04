@@ -8,7 +8,7 @@ defmodule Day04P1 do
   end
 
   defp map_line(line) do
-    ["Card " <> n, rest] = String.split(line, ": ")
+    ["Card " <> _n, rest] = String.split(line, ": ")
 
     [winning, yours] = String.split(rest, " | ")
 
