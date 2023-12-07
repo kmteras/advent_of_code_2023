@@ -8,7 +8,16 @@ defmodule Day05P1 do
   end
 
   defp map_input(lines) do
-    [seeds, seed_to_soil, soil_to_fertilizer, fertilizer_to_water, water_to_light, light_to_temperature, temperature_to_humidity, humidity_to_location] = lines
+    [
+      seeds,
+      seed_to_soil,
+      soil_to_fertilizer,
+      fertilizer_to_water,
+      water_to_light,
+      light_to_temperature,
+      temperature_to_humidity,
+      humidity_to_location
+    ] = lines
 
     "seeds: " <> seeds = seeds
 

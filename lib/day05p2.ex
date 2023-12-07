@@ -9,14 +9,24 @@ defmodule Day05P2 do
   end
 
   defp map_input(lines) do
-    [seeds, seed_to_soil, soil_to_fertilizer, fertilizer_to_water, water_to_light, light_to_temperature, temperature_to_humidity, humidity_to_location] = lines
+    [
+      seeds,
+      seed_to_soil,
+      soil_to_fertilizer,
+      fertilizer_to_water,
+      water_to_light,
+      light_to_temperature,
+      temperature_to_humidity,
+      humidity_to_location
+    ] = lines
 
     "seeds: " <> seeds = seeds
 
-    seeds = seeds
-    |> strings_to_nums()
-    |> Enum.chunk_every(2)
-    |> Enum.map(fn [start, length] -> Range.new(start, start + length - 1) end)
+    seeds =
+      seeds
+      |> strings_to_nums()
+      |> Enum.chunk_every(2)
+      |> Enum.map(fn [start, length] -> Range.new(start, start + length - 1) end)
 
     seed_to_soil = map_map(seed_to_soil)
     soil_to_fertilizer = map_map(soil_to_fertilizer)
@@ -62,7 +72,11 @@ defmodule Day05P2 do
             [{:new, Range.new(s + diff, map_end - 1 + diff)}, {:old, Range.new(map_end, e)}]
 
           s < map_start && e > map_end ->
-            [{:old, Range.new(s, map_start - 1)}, {:new, Range.new(map_start + diff, map_end + diff)}, {:old, Range.new(map_end + 1, e)}]
+            [
+              {:old, Range.new(s, map_start - 1)},
+              {:new, Range.new(map_start + diff, map_end + diff)},
+              {:old, Range.new(map_end + 1, e)}
+            ]
 
           true ->
             [{:old, range}]
