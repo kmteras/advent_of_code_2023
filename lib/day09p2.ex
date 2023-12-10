@@ -14,15 +14,17 @@ defmodule Day09P2 do
 
   defp predict(input) do
     first = Enum.at(input, 0)
-    {increases, _last} = Enum.reduce(input, fn v, acc ->
-      case acc do
-        {list, last} ->
-          {list ++ [v - last], v}
 
-        last ->
-          {[v - last], v}
-      end
-    end)
+    {increases, _last} =
+      Enum.reduce(input, fn v, acc ->
+        case acc do
+          {list, last} ->
+            {list ++ [v - last], v}
+
+          last ->
+            {[v - last], v}
+        end
+      end)
 
     if Enum.all?(increases, fn e -> e == 0 end) do
       first
