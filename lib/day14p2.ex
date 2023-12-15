@@ -101,15 +101,15 @@ defmodule Day14P2 do
         end
       end)
 
-      Enum.reduce(new_grid, new_grid, fn {{x, y}, t}, grid ->
-        if t == "#" do
-          grid
-        else
-          new_place = move_rock_right(grid, width, height, {x, y})
-          grid = Map.delete(grid, {x, y})
-          Map.put(grid, {new_place, y}, "O")
-        end
-      end)
+    Enum.reduce(new_grid, new_grid, fn {{x, y}, t}, grid ->
+      if t == "#" do
+        grid
+      else
+        new_place = move_rock_right(grid, width, height, {x, y})
+        grid = Map.delete(grid, {x, y})
+        Map.put(grid, {new_place, y}, "O")
+      end
+    end)
   end
 
   defp move_rock_up(grid, _, _, {x, y}) do
