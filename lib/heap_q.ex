@@ -47,13 +47,13 @@ defmodule HeapQueue do
   defstruct heap: nil
 
   def new(),
-      do: %HeapQueue{}
+    do: %HeapQueue{}
 
   def push_value(%HeapQueue{} = q, val),
-      do: push(q, val, val)
+    do: push(q, val, val)
 
   def push(%HeapQueue{heap: h} = q, pri, val),
-      do: %HeapQueue{q | heap: _merge({pri, nil, nil, :element, val}, h)}
+    do: %HeapQueue{q | heap: _merge({pri, nil, nil, :element, val}, h)}
 
   def pop_value(%HeapQueue{heap: h} = q) do
     {res, h_out} = _pop_value(h)
@@ -61,10 +61,10 @@ defmodule HeapQueue do
   end
 
   defp _pop_value(nil),
-       do: {:empty, nil}
+    do: {:empty, nil}
 
   defp _pop_value({_, hl, hr, :element, val}),
-       do: {{:value, val}, _merge(hl, hr)}
+    do: {{:value, val}, _merge(hl, hr)}
 
   defp _pop_value({p, hl, hr, :queue, queue}) do
     case :queue.out(queue) do
@@ -79,10 +79,10 @@ defmodule HeapQueue do
   end
 
   defp _pop(nil),
-       do: {:empty, nil}
+    do: {:empty, nil}
 
   defp _pop({p, hl, hr, :element, val}),
-       do: {{:value, p, val}, _merge(hl, hr)}
+    do: {{:value, p, val}, _merge(hl, hr)}
 
   defp _pop({p, hl, hr, :queue, queue}) do
     case :queue.out(queue) do
@@ -92,85 +92,85 @@ defmodule HeapQueue do
   end
 
   def size(%HeapQueue{heap: h}),
-      do: _size(0, _pop_value(h))
+    do: _size(0, _pop_value(h))
 
   defp _size(s, {:empty, _}),
-       do: s
+    do: s
 
   defp _size(s, {{:value, _}, h}),
-       do: _size(s + 1, _pop_value(h))
+    do: _size(s + 1, _pop_value(h))
 
   def to_list_of_values(%HeapQueue{heap: h}),
-      do: _to_list_of_values([], _pop_value(h))
+    do: _to_list_of_values([], _pop_value(h))
 
   defp _to_list_of_values(list, {:empty, _}),
-       do: :lists.reverse(list)
+    do: :lists.reverse(list)
 
   defp _to_list_of_values(list, {{:value, val}, h}),
-       do: _to_list_of_values([val | list], _pop_value(h))
+    do: _to_list_of_values([val | list], _pop_value(h))
 
   def to_list(%HeapQueue{heap: h}),
-      do: _to_list([], _pop(h))
+    do: _to_list([], _pop(h))
 
   defp _to_list(list, {:empty, _}),
-       do: :lists.reverse(list)
+    do: :lists.reverse(list)
 
   defp _to_list(list, {{:value, p, val}, h}),
-       do: _to_list([{p, val} | list], _pop(h))
+    do: _to_list([{p, val} | list], _pop(h))
 
   def empty?(%HeapQueue{heap: h}),
-      do: _empty?(h)
+    do: _empty?(h)
 
   defp _empty?(nil),
-       do: true
+    do: true
 
   defp _empty?({_, hl, hr, :queue, queue}),
-       do: _empty?(hl) and _empty?(hr) and :queue.is_empty(queue)
+    do: _empty?(hl) and _empty?(hr) and :queue.is_empty(queue)
 
   defp _empty?(_),
-       do: false
+    do: false
 
   def queue?(%HeapQueue{heap: h}),
-      do: _queue?(h)
+    do: _queue?(h)
 
   def queue?(_),
-      do: false
+    do: false
 
   defp _queue?(nil),
-       do: true
+    do: true
 
   defp _queue?({_, _, _, :element, _}),
-       do: true
+    do: true
 
   defp _queue?({_, _, _, :queue, queue}),
-       do: :queue.is_queue(queue)
+    do: :queue.is_queue(queue)
 
   defp _queue?(_),
-       do: false
+    do: false
 
   defp _merge(nil, nil),
-       do: nil
+    do: nil
 
   defp _merge(nil, {_, _, _, _, _} = h),
-       do: h
+    do: h
 
   defp _merge({_, _, _, _, _} = h, nil),
-       do: h
+    do: h
 
   defp _merge({p1, hl1, hr1, t, d}, {p2, _, _, _, _} = h2) when p1 < p2,
-       do: {p1, hl1, _merge(hr1, h2), t, d}
+    do: {p1, hl1, _merge(hr1, h2), t, d}
 
   defp _merge({p1, _, _, _, _} = h1, {p2, hl2, hr2, t, d}) when p1 > p2,
-       do: {p2, hl2, _merge(h1, hr2), t, d}
+    do: {p2, hl2, _merge(h1, hr2), t, d}
 
   defp _merge({p, hl1, hr1, :element, val1}, {p, hl2, hr2, :element, val2}),
-       do: {p, _merge(hl1, hr1), _merge(hl2, hr2), :queue, :queue.from_list([val2, val1])}
+    do: {p, _merge(hl1, hr1), _merge(hl2, hr2), :queue, :queue.from_list([val2, val1])}
 
   defp _merge({p, hl1, hr1, :queue, queue}, {p, hl2, hr2, :element, val}),
-       do: {p, _merge(hl1, hr1), _merge(hl2, hr2), :queue, :queue.in(val, queue)}
+    do: {p, _merge(hl1, hr1), _merge(hl2, hr2), :queue, :queue.in(val, queue)}
 
   defp _merge({p, hl1, hr1, :element, val}, {p, hl2, hr2, :queue, queue}),
-       do: {p, _merge(hl1, hr1), _merge(hl2, hr2), :queue, :queue.in(val, queue)}
+    do: {p, _merge(hl1, hr1), _merge(hl2, hr2), :queue, :queue.in(val, queue)}
 end
 
 defimpl Inspect, for: HeapQueue do

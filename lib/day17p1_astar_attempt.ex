@@ -1,10 +1,11 @@
 defmodule Day17P1A do
   def solve(filename) do
-    {width, height, grid} = File.read!(filename)
-                            |> String.trim()
-                            |> String.split("\n")
-                            |> grid_to_map()
-                            |> grid_info()
+    {width, height, grid} =
+      File.read!(filename)
+      |> String.trim()
+      |> String.split("\n")
+      |> grid_to_map()
+      |> grid_info()
 
     a_star(grid, {width, height}, MapSet.new([{0, 0}]), %{
       {0, 0} => %{g: 0, h: 0, f: 0, parent: nil}
@@ -54,6 +55,7 @@ defmodule Day17P1A do
                 else
                   next_list
                 end
+
                 #                [new_pos] ++ next_list
               end
             else
@@ -71,7 +73,7 @@ defmodule Day17P1A do
             #            g = abs(cx - x) + abs(cy - y)
             g = Map.get(grid, {x, y})
 
-            if g < Map.get(costs, pos, %{g: 1000000000000000}).g do
+            if g < Map.get(costs, pos, %{g: 1_000_000_000_000_000}).g do
               h = (abs(cx - ex) + abs(cy - ey)) * 9
               c = %{g: g, f: g + h, h: h, parent: current_node}
 
@@ -95,26 +97,14 @@ defmodule Day17P1A do
         back_3 = Map.get(costs, back_2.parent)
 
         if back_3 && back_3.parent do
-          back_4 = Map.get(costs, back_3.parent)
-
           back_3.parent
-
-#          if back_4 do
-#            back_4.parent
-#          end
-          #          back_3.parent
-#          back_back_back = Map.get(costs, back_3.parent)
-
-#          if back_back_back && back_back_back.parent do
-#            back_back_back.parent
-#          end
         end
       end
     end
   end
 
   defp find_path(grid, costs, node, heat) do
-#    IO.inspect(node)
+    #    IO.inspect(node)
     n = Map.get(costs, node)
     parent = Map.get(costs, node).parent
 
@@ -137,18 +127,18 @@ defmodule Day17P1A do
     |> Enum.map(&String.graphemes/1)
     |> Enum.with_index()
     |> Enum.reduce(
-         %{},
-         fn {line, y}, map ->
-           line
-           |> Enum.with_index()
-           |> Enum.reduce(
-                %{},
-                fn {risk, x}, map ->
-                  Map.put(map, {x, y}, String.to_integer(risk))
-                end
-              )
-           |> Map.merge(map)
-         end
-       )
+      %{},
+      fn {line, y}, map ->
+        line
+        |> Enum.with_index()
+        |> Enum.reduce(
+          %{},
+          fn {risk, x}, map ->
+            Map.put(map, {x, y}, String.to_integer(risk))
+          end
+        )
+        |> Map.merge(map)
+      end
+    )
   end
 end

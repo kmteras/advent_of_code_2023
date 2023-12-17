@@ -1,47 +1,21 @@
 defmodule Day17P2 do
   def solve(filename) do
-    {width, height, grid} = File.read!(filename)
-                            |> String.trim()
-                            |> String.split("\n")
-                            |> grid_to_map()
-                            |> grid_info()
+    {width, height, grid} =
+      File.read!(filename)
+      |> String.trim()
+      |> String.split("\n")
+      |> grid_to_map()
+      |> grid_info()
 
-    {nodes, cur_dis} = dijkstra(grid, {0, 0}, Map.new(), {width, height})
+    {nodes, cur_dis} = dijkstra(grid, {0, 0}, {width, height})
 
-    {Enum.filter(nodes, fn {{{x, y}, dir, s}, v} -> x == width && y == height end), cur_dis}
+    {Enum.filter(nodes, fn {{{x, y}, _, _}, _} -> x == width && y == height end), cur_dis}
   end
 
-  defp get_path_set(prev, node, set \\ MapSet.new(), {width, height}) do
-    set = MapSet.put(set, node)
-    prev_node = Map.get(prev, node)
-
-    if prev_node != nil do
-      get_path_set(prev, prev_node, set)
-    else
-      set
-    end
-  end
-
-  defp get_path(prev, node) do
-    prev_node = Map.get(prev, node)
-
-    if prev_node != nil do
-      get_path(prev, prev_node)
-    end
-  end
-
-  defp get_distance(dist, prev, node, total \\ 0) do
-    Map.get(dist, node)
-  end
-
-  defp dijkstra(grid, source, dist, {width, height}) do
-    nodes =
-      Map.keys(grid)
-      |> MapSet.new()
-
+  defp dijkstra(grid, source, {width, height}) do
     dist =
       Map.keys(grid)
-      |> Enum.map(fn k -> {k, 10000000000} end)
+      |> Enum.map(fn k -> {k, 10_000_000_000} end)
       |> Map.new()
 
     dist = Map.put(dist, source, 0)
@@ -49,8 +23,8 @@ defmodule Day17P2 do
 
     nodes = HeapQueue.new()
 
-    nodes = HeapQueue.push(nodes, 0, {{0,0}, {1, 0}, 0})
-    nodes = HeapQueue.push(nodes, 0, {{0,0}, {0, 1}, 0})
+    nodes = HeapQueue.push(nodes, 0, {{0, 0}, {1, 0}, 0})
+    nodes = HeapQueue.push(nodes, 0, {{0, 0}, {0, 1}, 0})
 
     dijkstra_cont(grid, nodes, dist, prev, Map.new(), {width, height})
   end
@@ -66,66 +40,42 @@ defmodule Day17P2 do
         dijkstra_cont(grid, nodes, dist, prev, matched_nodes, {width, height})
 
       true ->
-
         matched_nodes = Map.put_new(matched_nodes, {{x, y}, dir, s}, cur_dis)
-      all_directions = [{1, 0}, {-1, 0}, {0, 1}, {0, -1}]
 
-      straight = {x + dx, y + dy}
+        straight = {x + dx, y + dy}
 
-      nodes = if s < 10 && Map.has_key?(grid, straight) do
-        distance = cur_dis + Map.get(grid, straight)
+        nodes =
+          if s < 10 && Map.has_key?(grid, straight) do
+            distance = cur_dis + Map.get(grid, straight)
 
-        HeapQueue.push(nodes, distance, {straight, dir, s + 1})
-      else
-        nodes
-      end
+            HeapQueue.push(nodes, distance, {straight, dir, s + 1})
+          else
+            nodes
+          end
 
-      {ldx, ldy} = left_dir = left(dir)
-      left_pos = {x + ldx, y + ldy}
+        {ldx, ldy} = left_dir = left(dir)
+        left_pos = {x + ldx, y + ldy}
 
-      nodes = if Map.has_key?(grid, left_pos) && s >= 4 do
-        distance = cur_dis + Map.get(grid, left_pos)
-        HeapQueue.push(nodes, distance, {left_pos, left_dir, 1})
-      else
-        nodes
-      end
+        nodes =
+          if Map.has_key?(grid, left_pos) && s >= 4 do
+            distance = cur_dis + Map.get(grid, left_pos)
+            HeapQueue.push(nodes, distance, {left_pos, left_dir, 1})
+          else
+            nodes
+          end
 
-      {rdx, rdy} = right_dir = right(dir)
-      right_pos = {x + rdx, y + rdy}
+        {rdx, rdy} = right_dir = right(dir)
+        right_pos = {x + rdx, y + rdy}
 
-      nodes = if Map.has_key?(grid, right_pos) && s >= 4 do
-        distance = cur_dis + Map.get(grid, right_pos)
-        HeapQueue.push(nodes, distance, {right_pos, right_dir, 1})
-      else
-        nodes
-      end
+        nodes =
+          if Map.has_key?(grid, right_pos) && s >= 4 do
+            distance = cur_dis + Map.get(grid, right_pos)
+            HeapQueue.push(nodes, distance, {right_pos, right_dir, 1})
+          else
+            nodes
+          end
 
-#      {nodes, dist, prev} = Enum.reduce(directions, {nodes, dist, prev}, fn {dx, dy}, {nodes, dist, prev} ->
-#        nn = {x + dx, y + dy}
-#
-#        s = if dir == {dx, dy} do
-#          s + 1
-#        else
-#          1
-#        end
-#
-#        if Map.has_key?(grid, nn) do
-##          current = Map.get(dist, {x, y})
-#          distance = cur_dis + Map.get(grid, nn)
-#
-#          nodes = if !Map.has_key?(matched_nodes, {nn, {dx, dy}}) && (s < 4 || s < 3 && dir == {dx, dy}) do
-#            MapSet.put(nodes, {nn, {dx, dy}, s, distance})
-#          else
-#            nodes
-#          end
-#
-#          {nodes, dist, prev}
-#        else
-#          {nodes, dist, prev}
-#        end
-#      end)
-
-      dijkstra_cont(grid, nodes, dist, prev, matched_nodes, {width, height})
+        dijkstra_cont(grid, nodes, dist, prev, matched_nodes, {width, height})
     end
   end
 
@@ -163,35 +113,36 @@ defmodule Day17P2 do
     |> Enum.map(&String.graphemes/1)
     |> Enum.with_index()
     |> Enum.reduce(
-         %{},
-         fn {line, y}, map ->
-           line
-           |> Enum.with_index()
-           |> Enum.reduce(
-                %{},
-                fn {risk, x}, map ->
-                  Map.put(map, {x, y}, String.to_integer(risk))
-                end
-              )
-           |> Map.merge(map)
-         end
-       )
+      %{},
+      fn {line, y}, map ->
+        line
+        |> Enum.with_index()
+        |> Enum.reduce(
+          %{},
+          fn {risk, x}, map ->
+            Map.put(map, {x, y}, String.to_integer(risk))
+          end
+        )
+        |> Map.merge(map)
+      end
+    )
   end
 
-  defp pretty_grid(width, height, map \\ MapSet.new()) do
-    0..height
-    |> Enum.map(fn y ->
-      ""
-      0..width
-      |> Enum.map(fn x ->
-        if MapSet.member?(map, {x, y}) do
-          "#"
-        else
-          "."
-        end
-      end)
-      |> Enum.join("")
-      |> IO.inspect(pretty: true)
-    end)
-  end
+  #  defp pretty_grid(width, height, map \\ MapSet.new()) do
+  #    0..height
+  #    |> Enum.map(fn y ->
+  #      ""
+  #
+  #      0..width
+  #      |> Enum.map(fn x ->
+  #        if MapSet.member?(map, {x, y}) do
+  #          "#"
+  #        else
+  #          "."
+  #        end
+  #      end)
+  #      |> Enum.join("")
+  #      |> IO.inspect(pretty: true)
+  #    end)
+  #  end
 end
