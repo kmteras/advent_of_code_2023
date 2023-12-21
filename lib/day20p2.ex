@@ -16,7 +16,9 @@ defmodule Day20P2 do
   end
 
   defp press_button({modules, states, to_observe}) do
-    Enum.reduce_while(1..10000000, {states, Map.new(to_observe, fn v -> {v, nil} end)}, fn i, {states, observations} ->
+    Enum.reduce_while(1..10_000_000, {states, Map.new(to_observe, fn v -> {v, nil} end)}, fn i,
+                                                                                             {states,
+                                                                                              observations} ->
       {states, observations} =
         send_pulses({modules, states}, [{"broadcaster", false, "button"}], i, observations)
 
@@ -40,11 +42,12 @@ defmodule Day20P2 do
        ) do
     target_info = Map.get(modules, target)
 
-    observations = if signal && Map.get(observations, origin, false) == nil do
-      Map.put(observations, origin, i)
-    else
-      observations
-    end
+    observations =
+      if signal && Map.get(observations, origin, false) == nil do
+        Map.put(observations, origin, i)
+      else
+        observations
+      end
 
     if target_info == nil do
       send_pulses({modules, states}, target_queue, i, observations)
