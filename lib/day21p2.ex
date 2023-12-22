@@ -12,75 +12,32 @@ defmodule Day21P2 do
     |> grid_info()
     |> look_for_neighbors()
 
-    start_cycle = 475
-    cycle_start = 150538
-    cycle_length = 11
-
-    n = 3
-#    n = 3
-    shift = 8
-
-    wanted_cycle = 1000
-
-    IO.inspect("n: #{floor((wanted_cycle - start_cycle) / cycle_length)}")
-    IO.inspect("shift: #{rem(wanted_cycle - start_cycle, cycle_length)}")
-
-    cycle_diff = 7066
-    cycle_diff_diff = 162
-
-    moved_cycles = start_cycle + n * cycle_length + shift
-    new_cycle_value = cycle_start + cycle_diff * n + cycle_diff_diff * of(n - 1)
-
-    # Precalculated for a increase of 3
-#    cycle_shift = 2076
-#    cycle_shift_shift = 48
-
-    # Precalculated for a increase of 8
-    cycle_shift = 5369
-    cycle_shift_shift = 121
-
-    # 5611
-
-    # 7552
-    # 7390
-    # 7228
-    # 7066
-
-    new_shift = new_cycle_value + cycle_shift + cycle_shift_shift * (n - 1)
-
     l = :ets.tab2list(:memory2)
 
     cycle_length = 131
-#    cycle_length = 11
+    #    cycle_length = 11
 
-    want_index = 26501365
+    want_index = 26_501_365
 
     chunked = Enum.chunk_every(l, cycle_length, cycle_length, :discard)
 
-    cycle_offsets = chunked
-    |> Enum.chunk_every(2, 1, :discard)
-    |> Enum.map(fn [[{_, v} | _], [{_, v2} | _]] ->
-      v2 - v
-    end)
-#    |> IO.inspect()
+    cycle_offsets =
+      chunked
+      |> Enum.chunk_every(2, 1, :discard)
+      |> Enum.map(fn [[{_, v} | _], [{_, v2} | _]] ->
+        v2 - v
+      end)
 
-    cycle_offsets_offsets = cycle_offsets
-    |> Enum.chunk_every(2, 1, :discard)
-    |> Enum.map(fn [f, s] ->
-      s - f
-    end)
-#     |> IO.inspect()
+    #    |> IO.inspect()
 
-    a = chunked
-        |> Enum.map(fn list ->
-      (elem(Enum.at(list, 1), 1)) - elem(Enum.at(list, 0), 1)
-    end)
-#        |> IO.inspect()
-        |> Enum.chunk_every(2, 1, :discard)
-        |> Enum.map(fn [f, s] ->
-      s - f
-    end)
-#    |> IO.inspect()
+    cycle_offsets_offsets =
+      cycle_offsets
+      |> Enum.chunk_every(2, 1, :discard)
+      |> Enum.map(fn [f, s] ->
+        s - f
+      end)
+
+    #     |> IO.inspect()
 
     last_complete = Enum.at(chunked, -2)
 
@@ -93,29 +50,39 @@ defmodule Day21P2 do
 
     IO.inspect(chunked)
 
-    new_cycle_value = start_v + Enum.at(cycle_offsets, -2) * cycles + Enum.at(cycle_offsets_offsets, -1) * floor(((cycles) * (cycles + 1) / 2))
+    new_cycle_value =
+      start_v + Enum.at(cycle_offsets, -2) * cycles +
+        Enum.at(cycle_offsets_offsets, -1) * floor(cycles * (cycles + 1) / 2)
 
     shift_offsets = shift_at(chunked, shift)
 
     IO.inspect(shift_offsets)
 
-    shift_offset_offsets = shift_offsets
-    |> Enum.chunk_every(2, 1, :discard)
-    |> Enum.map(fn [f, s] ->
-      s - f
-    end)
-    |> IO.inspect()
+    shift_offset_offsets =
+      shift_offsets
+      |> Enum.chunk_every(2, 1, :discard)
+      |> Enum.map(fn [f, s] ->
+        s - f
+      end)
+      |> IO.inspect()
 
-    IO.inspect({Enum.at(shift_offsets, -2), Enum.at(shift_offset_offsets, -2), floor(((cycles) * (cycles + 1) / 2))})
+    IO.inspect(
+      {Enum.at(shift_offsets, -2), Enum.at(shift_offset_offsets, -2),
+       floor(cycles * (cycles + 1) / 2)}
+    )
 
     # 648
     # 648 + 14 * 20
 
-    new_value = new_cycle_value + Enum.at(shift_offsets, -2) + Enum.at(shift_offset_offsets, -2) * cycles
+    new_value =
+      new_cycle_value + Enum.at(shift_offsets, -2) + Enum.at(shift_offset_offsets, -2) * cycles
 
-    IO.inspect({start_i + cycles * cycle_length, new_cycle_value, start_i + cycles * cycle_length + shift, new_value})
+    IO.inspect(
+      {start_i + cycles * cycle_length, new_cycle_value, start_i + cycles * cycle_length + shift,
+       new_value}
+    )
 
-#    IO.inspect({moved_cycles, new_shift, start_cycle + n * cycle_length, new_cycle_value})
+    #    IO.inspect({moved_cycles, new_shift, start_cycle + n * cycle_length, new_cycle_value})
   end
 
   def shift_at(chunked, shift) do
@@ -126,6 +93,7 @@ defmodule Day21P2 do
   end
 
   def of(0), do: 1
+
   def of(n) when n > 0 do
     Enum.reduce(1..n, &*/2)
   end
@@ -137,20 +105,22 @@ defmodule Day21P2 do
     {width + 1, height + 1, grid}
   end
 
+  defp look_for_neighbors(info, lookup_positions \\ nil, steps \\ 0)
+
   defp look_for_neighbors(_, current_positions, steps = 500) do
-    [{_day, {from, to}}] = :ets.lookup(:memory, rem(steps, 2))
+    [{_day, {from, _}}] = :ets.lookup(:memory, rem(steps, 2))
 
     Enum.count(current_positions) + Enum.count(from)
   end
 
-  defp look_for_neighbors({width, height, grid}, lookup_positions \\ nil, steps \\ 0) do
+  defp look_for_neighbors({width, height, grid}, lookup_positions, steps) do
     if rem(steps, 10000) == 0 do
       IO.inspect(steps)
     end
 
     lookup_positions =
       if lookup_positions == nil do
-        {p, _} = Enum.find(grid, fn {p, v} -> v == "S" end)
+        {p, _} = Enum.find(grid, fn {_, v} -> v == "S" end)
         MapSet.new([p])
       else
         lookup_positions
@@ -165,7 +135,7 @@ defmodule Day21P2 do
           {MapSet.new(), MapSet.new()}
       end
 
-    {n_from, n_to} =
+    {n_from, _} =
       case :ets.lookup(:memory, rem(steps + 1, 2)) do
         [{_day, {from, to}}] ->
           {from, to}
@@ -181,7 +151,7 @@ defmodule Day21P2 do
             new_positions ->
               {px, py} = p = {x + dx, y + dy}
 
-              {npx, npy} = normalized_p = {rem(px, width), rem(py, height)}
+              {npx, npy} = {rem(px, width), rem(py, height)}
 
               normalized_p =
                 cond do
@@ -199,28 +169,7 @@ defmodule Day21P2 do
           end
       end
 
-    normalized_count =
-      normalize(width, height, lookup_positions)
-      |> MapSet.new()
-      |> Enum.count()
-
-    normalized_new_positions_count =
-      normalize(width, height, new_positions)
-      |> MapSet.new()
-      |> Enum.count()
-
-#    IO.inspect(
-#      {steps,
-#        Enum.count(new_positions) - Enum.count(lookup_positions),
-#        normalized_count, normalized_new_positions_count,
-#       Enum.count(lookup_positions), Enum.count(new_positions),
-#        Enum.count(lookup_positions) + Enum.count(from)
-#      }
-#    )
-
-        IO.puts(
-          "#{steps}\t#{Enum.count(lookup_positions) + Enum.count(from)}"
-        )
+    IO.puts("#{steps}\t#{Enum.count(lookup_positions) + Enum.count(from)}")
 
     :ets.insert(:memory2, {steps, Enum.count(lookup_positions) + Enum.count(from)})
 
@@ -232,20 +181,6 @@ defmodule Day21P2 do
     )
 
     look_for_neighbors({width, height, grid}, new_positions, steps + 1)
-  end
-
-  defp normalize(width, height, lookup_positions) do
-    Enum.map(lookup_positions, fn {x, y} ->
-      {npx, npy} = normalized_p = {rem(x, width), rem(y, height)}
-
-      normalized_p =
-        cond do
-          npx < 0 && npy < 0 -> {width + npx, height + npy}
-          npx < 0 -> {width + npx, npy}
-          npy < 0 -> {npx, height + npy}
-          true -> {npx, npy}
-        end
-    end)
   end
 
   defp grid_to_map(grid) do

@@ -7,15 +7,17 @@ defmodule Day21P1 do
     |> look_for_neighbors()
   end
 
+  defp look_for_neighbors(info, current_positions \\ nil, explored \\ MapSet.new(), steps \\ 0)
+
   defp look_for_neighbors(_, current_positions, _, 64) do
     #    IO.inspect(current_positions)
     Enum.count(current_positions)
   end
 
-  defp look_for_neighbors(grid, current_positions \\ nil, explored \\ MapSet.new(), steps \\ 0) do
+  defp look_for_neighbors(grid, current_positions, explored, steps) do
     current_positions =
       if current_positions == nil do
-        {p, _} = Enum.find(grid, fn {p, v} -> v == "S" end)
+        {p, _} = Enum.find(grid, fn {_, v} -> v == "S" end)
         MapSet.new([p])
       else
         current_positions
