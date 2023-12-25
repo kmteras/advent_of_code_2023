@@ -4,8 +4,8 @@ defmodule Day24P2 do
     |> String.trim()
     |> String.split("\n")
     |> Enum.map(&map_line/1)
-      #    |> check_intersections(7, 27)
-    |> check_intersections(200000000000000, 400000000000000)
+    #    |> check_intersections(7, 27)
+    |> check_intersections(200_000_000_000_000, 400_000_000_000_000)
     |> ans()
   end
 
@@ -43,6 +43,7 @@ defmodule Day24P2 do
               IO.inspect({l1, l2})
 
               IO.inspect({x, y})
+
               if x >= s && x <= e && y >= s && y <= e do
                 [{l1, l2}]
               else
@@ -63,11 +64,13 @@ defmodule Day24P2 do
 
   defp map_line(line) do
     line = String.replace(line, " @ ", ", ")
-    [x, y, z, vx, vy, vz] = line
-                            |> String.split(", ")
-                            |> Enum.map(&String.trim/1)
-                            |> Enum.filter(fn v -> v != "" end)
-                            |> Enum.map(&String.to_integer/1)
+
+    [x, y, z, vx, vy, vz] =
+      line
+      |> String.split(", ")
+      |> Enum.map(&String.trim/1)
+      |> Enum.filter(fn v -> v != "" end)
+      |> Enum.map(&String.to_integer/1)
 
     {{x, y, z}, {vx, vy, vz}}
   end
