@@ -1,5 +1,5 @@
 defmodule Day23P1 do
-  @big_n 10000000
+  @big_n 10_000_000
 
   def solve(filename) do
     :ets.new(:memory, [:set, :public, :named_table])
@@ -36,7 +36,6 @@ defmodule Day23P1 do
         nodes =
           for {dx, dy} <- [{1, 0}, {-1, 0}, {0, 1}, {0, -1}], reduce: nodes do
             nodes ->
-
               pos = {x + dx, y + dy}
 
               if Map.has_key?(grid, pos) && !going_up_slope(Map.get(grid, pos), {dx, dy}) do
@@ -73,22 +72,22 @@ defmodule Day23P1 do
     |> Enum.map(&String.graphemes/1)
     |> Enum.with_index()
     |> Enum.reduce(
-         %{},
-         fn {line, y}, map ->
-           line
-           |> Enum.with_index()
-           |> Enum.reduce(
-                %{},
-                fn {risk, x}, map ->
-                  if risk != "#" do
-                    Map.put(map, {x, y}, risk)
-                  else
-                    map
-                  end
-                end
-              )
-           |> Map.merge(map)
-         end
-       )
+      %{},
+      fn {line, y}, map ->
+        line
+        |> Enum.with_index()
+        |> Enum.reduce(
+          %{},
+          fn {risk, x}, map ->
+            if risk != "#" do
+              Map.put(map, {x, y}, risk)
+            else
+              map
+            end
+          end
+        )
+        |> Map.merge(map)
+      end
+    )
   end
 end
